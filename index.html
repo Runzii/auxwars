@@ -1,668 +1,183 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-<style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body {
-    background: #0a0a0a;
-    font-family: 'Space Mono', monospace;
-    color: #fff;
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aux Wars - Midnight Neon Edition</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;800;900&family=Inter:wght@400;600&display=swap');
 
-  .screen { display: none; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; }
-  .screen.active { display: flex; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
-  /* LOBBY */
-  #lobby {
-    background: #0a0a0a;
-    text-align: center;
-  }
-  .logo {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 96px;
-    line-height: 1;
-    letter-spacing: 4px;
-    color: #FFE000;
-    text-shadow: 4px 4px 0px #FF2D78;
-    animation: pulse-logo 2s ease-in-out infinite;
-  }
-  @keyframes pulse-logo {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.03); }
-  }
-  .logo-sub {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 22px;
-    letter-spacing: 8px;
-    color: #FF2D78;
-    margin-top: -8px;
-    margin-bottom: 40px;
-  }
-  .rules-card {
-    background: #111;
-    border: 1px solid #333;
-    border-radius: 12px;
-    padding: 28px 36px;
-    max-width: 540px;
-    text-align: left;
-    margin-bottom: 36px;
-  }
-  .rules-title {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 20px;
-    letter-spacing: 3px;
-    color: #FFE000;
-    margin-bottom: 16px;
-  }
-  .rule-item {
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-    margin-bottom: 12px;
-    font-size: 13px;
-    color: #ccc;
-    line-height: 1.5;
-  }
-  .rule-num {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 22px;
-    color: #FF2D78;
-    min-width: 24px;
-    line-height: 1;
-    margin-top: -2px;
-  }
-  .btn-start {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 28px;
-    letter-spacing: 4px;
-    background: #FFE000;
-    color: #0a0a0a;
-    border: none;
-    padding: 16px 56px;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: transform 0.1s, background 0.2s;
-  }
-  .btn-start:hover { background: #FF2D78; color: #fff; transform: scale(1.04); }
-  .btn-start:active { transform: scale(0.97); }
+        body {
+            background-color: #0B0C10;
+            color: #FFFFFF;
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+        }
 
-  /* SETUP */
-  #setup { background: #0a0a0a; gap: 20px; padding: 40px 24px; }
-  .setup-title {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 40px;
-    letter-spacing: 4px;
-    color: #FFE000;
-    margin-bottom: 4px;
-  }
-  .setup-subtitle { font-size: 12px; color: #888; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px; }
-  .setup-grid {
-    display: grid;
-    grid-template-columns: 1fr 80px 1fr;
-    gap: 16px;
-    align-items: start;
-    width: 100%;
-    max-width: 700px;
-  }
-  .song-input-card {
-    background: #111;
-    border: 1px solid #333;
-    border-radius: 12px;
-    padding: 20px;
-  }
-  .song-label {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 18px;
-    letter-spacing: 3px;
-    margin-bottom: 12px;
-  }
-  .label-a { color: #FFE000; }
-  .label-b { color: #FF2D78; }
-  .field-label { font-size: 10px; color: #666; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 5px; margin-top: 12px; }
-  .field-label:first-of-type { margin-top: 0; }
-  input[type="text"] {
-    width: 100%;
-    background: #1a1a1a;
-    border: 1px solid #333;
-    border-radius: 6px;
-    padding: 10px 12px;
-    color: #fff;
-    font-family: 'Space Mono', monospace;
-    font-size: 13px;
-    outline: none;
-    transition: border-color 0.2s;
-  }
-  input[type="text"]:focus { border-color: #FFE000; }
-  .vs-divider {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding-top: 36px;
-  }
-  .vs-text {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 48px;
-    color: #fff;
-    opacity: 0.15;
-  }
-  .timer-row {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    width: 100%;
-    max-width: 700px;
-    background: #111;
-    border: 1px solid #333;
-    border-radius: 10px;
-    padding: 14px 20px;
-  }
-  .timer-row label { font-size: 11px; color: #888; letter-spacing: 2px; text-transform: uppercase; white-space: nowrap; }
-  .timer-row input[type="range"] { flex: 1; accent-color: #FFE000; }
-  .timer-val {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 28px;
-    color: #FFE000;
-    min-width: 60px;
-    text-align: right;
-  }
-  .keywords-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    width: 100%;
-    max-width: 700px;
-  }
-  .keyword-card {
-    background: #111;
-    border: 1px solid #333;
-    border-radius: 10px;
-    padding: 14px 18px;
-  }
-  .btn-fight {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 32px;
-    letter-spacing: 4px;
-    background: #FF2D78;
-    color: #fff;
-    border: none;
-    padding: 16px 64px;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: transform 0.1s, background 0.2s;
-  }
-  .btn-fight:hover { background: #FFE000; color: #0a0a0a; transform: scale(1.04); }
-  .btn-fight:active { transform: scale(0.97); }
+        /* Neon Glow Header */
+        .header-container {
+            text-align: center;
+            margin-bottom: 40px;
+        }
 
-  /* BATTLE */
-  #battle { background: #0a0a0a; gap: 0; padding: 0; justify-content: flex-start; }
-  .battle-header {
-    width: 100%;
-    background: #111;
-    border-bottom: 1px solid #222;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 12px 28px;
-  }
-  .battle-logo {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 32px;
-    letter-spacing: 3px;
-    color: #FFE000;
-  }
-  .round-badge {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 16px;
-    letter-spacing: 3px;
-    color: #888;
-    background: #1a1a1a;
-    border: 1px solid #333;
-    padding: 4px 14px;
-    border-radius: 20px;
-  }
-  .timer-display {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 36px;
-    color: #FFE000;
-    min-width: 60px;
-    text-align: right;
-  }
-  .timer-display.urgent { color: #FF2D78; animation: blink 0.5s ease infinite; }
-  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.4} }
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 4rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            color: #66FCF1;
+            text-shadow: 0 0 10px rgba(102, 252, 241, 0.6),
+                         0 0 30px rgba(102, 252, 241, 0.3);
+            line-height: 1;
+        }
 
-  .battle-arena {
-    display: grid;
-    grid-template-columns: 1fr auto 1fr;
-    width: 100%;
-    flex: 1;
-    min-height: 0;
-    padding: 28px 20px;
-    gap: 0;
-    align-items: start;
-  }
-  .song-card {
-    background: #111;
-    border-radius: 16px;
-    padding: 28px 24px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    gap: 12px;
-    position: relative;
-    overflow: hidden;
-    border: 1px solid #222;
-    transition: border-color 0.3s;
-  }
-  .song-card.leading { border-color: #FFE000; }
-  .song-card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 3px;
-  }
-  .song-card.card-a::before { background: #FFE000; }
-  .song-card.card-b::before { background: #FF2D78; }
+        .subtitle {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 6px;
+            color: #FF007F;
+            margin-top: 10px;
+            text-shadow: 0 0 10px rgba(255, 0, 127, 0.5);
+        }
 
-  .card-letter {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 80px;
-    line-height: 1;
-  }
-  .card-a .card-letter { color: #FFE000; }
-  .card-b .card-letter { color: #FF2D78; }
+        /* Rules Card */
+        .rules-card {
+            background: rgba(31, 40, 51, 0.4);
+            border: 1px solid rgba(102, 252, 241, 0.2);
+            backdrop-filter: blur(12px);
+            border-radius: 16px;
+            padding: 40px;
+            max-width: 650px;
+            width: 100%;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+            margin-bottom: 40px;
+        }
 
-  .card-song-title {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 24px;
-    letter-spacing: 1px;
-    color: #fff;
-    line-height: 1.2;
-  }
-  .card-artist {
-    font-size: 12px;
-    color: #888;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-  }
-  .card-user {
-    font-size: 12px;
-    color: #555;
-    letter-spacing: 1px;
-  }
+        .rules-list {
+            list-style: none;
+        }
 
-  .vote-pill {
-    margin-top: 8px;
-    padding: 8px 24px;
-    border-radius: 100px;
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 18px;
-    letter-spacing: 3px;
-  }
-  .vote-pill-a { background: #1a1700; color: #FFE000; border: 1px solid #FFE000; }
-  .vote-pill-b { background: #1a0010; color: #FF2D78; border: 1px solid #FF2D78; }
+        .rule-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 25px;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            color: #C5A1FF; /* Soft lavender for text readability */
+            color: rgba(255, 255, 255, 0.85);
+        }
 
-  .vote-count {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 52px;
-    line-height: 1;
-    margin-top: 4px;
-  }
-  .count-a { color: #FFE000; }
-  .count-b { color: #FF2D78; }
+        .rule-item:last-child {
+            margin-bottom: 0;
+        }
 
-  .vote-bar-wrap {
-    width: 100%;
-    height: 6px;
-    background: #222;
-    border-radius: 3px;
-    overflow: hidden;
-    margin-top: 4px;
-  }
-  .vote-bar-fill {
-    height: 100%;
-    border-radius: 3px;
-    transition: width 0.4s ease;
-  }
-  .bar-a { background: #FFE000; }
-  .bar-b { background: #FF2D78; }
+        .rule-number {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: #FF007F;
+            margin-right: 20px;
+            line-height: 1;
+            min-width: 30px;
+        }
 
-  .vs-center {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 0 16px;
-    gap: 10px;
-    padding-top: 80px;
-  }
-  .vs-big {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 64px;
-    line-height: 1;
-    background: linear-gradient(135deg, #FFE000, #FF2D78);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-  .engage-bar {
-    width: 100%;
-    background: #111;
-    border-top: 1px solid #1a1a1a;
-    padding: 14px 28px;
-    display: flex;
-    align-items: center;
-    gap: 16px;
-  }
-  .engage-label { font-size: 10px; color: #555; letter-spacing: 2px; text-transform: uppercase; white-space: nowrap; }
-  .engage-text {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 16px;
-    letter-spacing: 2px;
-    color: #ccc;
-  }
-  .pin-badge {
-    margin-left: auto;
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 14px;
-    letter-spacing: 2px;
-    background: #FF2D78;
-    color: #fff;
-    padding: 5px 16px;
-    border-radius: 20px;
-    white-space: nowrap;
-  }
-  .sim-btn {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 14px;
-    letter-spacing: 2px;
-    background: transparent;
-    color: #444;
-    border: 1px solid #333;
-    padding: 6px 16px;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: color 0.2s, border-color 0.2s;
-    white-space: nowrap;
-  }
-  .sim-btn:hover { color: #ccc; border-color: #555; }
-  .sim-btn-a { }
-  .sim-btn-b { }
+        /* Styling for the specific mechanics */
+        .highlight-cyan {
+            color: #66FCF1;
+            font-weight: 600;
+        }
 
-  /* WINNER */
-  #winner { background: #0a0a0a; text-align: center; gap: 20px; }
-  .winner-crown {
-    font-size: 80px;
-    animation: float 2s ease-in-out infinite;
-  }
-  @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
-  .winner-label {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 18px;
-    letter-spacing: 6px;
-    color: #888;
-  }
-  .winner-song {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 56px;
-    line-height: 1.1;
-    color: #FFE000;
-    text-shadow: 3px 3px 0 #FF2D78;
-    max-width: 600px;
-  }
-  .winner-artist { font-size: 14px; color: #888; letter-spacing: 2px; text-transform: uppercase; }
-  .winner-user {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 20px;
-    letter-spacing: 4px;
-    color: #FF2D78;
-  }
-  .winner-cta {
-    background: #111;
-    border: 1px solid #333;
-    border-radius: 12px;
-    padding: 20px 36px;
-    max-width: 480px;
-    margin-top: 8px;
-  }
-  .winner-cta-title {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 16px;
-    letter-spacing: 3px;
-    color: #FFE000;
-    margin-bottom: 8px;
-  }
-  .winner-cta-text { font-size: 13px; color: #888; line-height: 1.7; }
-  .winner-cta-text strong { color: #FF2D78; }
-  .btn-next {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 24px;
-    letter-spacing: 3px;
-    background: #FFE000;
-    color: #0a0a0a;
-    border: none;
-    padding: 14px 48px;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: transform 0.1s, background 0.2s;
-  }
-  .btn-next:hover { background: #FF2D78; color: #fff; transform: scale(1.04); }
-</style>
+        .highlight-magenta {
+            color: #FF007F;
+            font-weight: 600;
+        }
+
+        .code-command {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-family: monospace;
+            color: #66FCF1;
+            border: 1px solid rgba(102, 252, 241, 0.3);
+            font-size: 1.1rem;
+        }
+
+        /* Action Button */
+        .start-btn {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #0B0C10;
+            background-color: #66FCF1;
+            border: none;
+            border-radius: 8px;
+            padding: 16px 48px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 15px rgba(102, 252, 241, 0.4);
+        }
+
+        .start-btn:hover {
+            background-color: #FFFFFF;
+            box-shadow: 0 0 25px rgba(102, 252, 241, 0.8);
+            transform: translateY(-2px);
+        }
+
+        .start-btn:active {
+            transform: translateY(1px);
+        }
+    </style>
 </head>
 <body>
 
-<!-- LOBBY -->
-<div class="screen active" id="lobby">
-  <div class="logo">AUX WARS</div>
-  <div class="logo-sub">Who Controls The Aux?</div>
-  <div class="rules-card">
-    <div class="rules-title">How To Play</div>
-    <div class="rule-item"><span class="rule-num">1</span><span>Two songs go head-to-head in the queue. The chat votes for who keeps the Aux Cord.</span></div>
-    <div class="rule-item"><span class="rule-num">2</span><span>Type the keyword in chat to cast your vote.</span></div>
-    <div class="rule-item"><span class="rule-num">3</span><span>The winning song's submitter gets <strong style="color:#FFE000">pinned at the top of chat</strong> for 3 minutes.</span></div>
-    <div class="rule-item"><span class="rule-num">4</span><span>The whole stream runs over to drop <strong style="color:#FF2D78">likes on their pinned video!</strong></span></div>
-  </div>
-  <button class="btn-start" onclick="goTo('setup')">Start A Round</button>
-</div>
-
-<!-- SETUP -->
-<div class="screen" id="setup">
-  <div class="setup-title">New Round</div>
-  <div class="setup-subtitle">Enter Both Songs</div>
-
-  <div class="setup-grid">
-    <div class="song-input-card">
-      <div class="song-label label-a">Song A</div>
-      <div class="field-label">Song Title</div>
-      <input type="text" id="a-title" placeholder="e.g. HUMBLE." />
-      <div class="field-label">Artist</div>
-      <input type="text" id="a-artist" placeholder="e.g. Kendrick Lamar" />
-      <div class="field-label">Submitted by</div>
-      <input type="text" id="a-user" placeholder="@username" />
-    </div>
-    <div class="vs-divider"><div class="vs-text">VS</div></div>
-    <div class="song-input-card">
-      <div class="song-label label-b">Song B</div>
-      <div class="field-label">Song Title</div>
-      <input type="text" id="b-title" placeholder="e.g. Rich Flex" />
-      <div class="field-label">Artist</div>
-      <input type="text" id="b-artist" placeholder="e.g. Drake & 21 Savage" />
-      <div class="field-label">Submitted by</div>
-      <input type="text" id="b-user" placeholder="@username" />
-    </div>
-  </div>
-
-  <div class="keywords-row">
-    <div class="keyword-card">
-      <div class="field-label" style="color:#FFE000">Vote Keyword — Song A</div>
-      <input type="text" id="kw-a" placeholder='e.g. "SONG A" or "FIRE"' style="border-color:#333" />
-    </div>
-    <div class="keyword-card">
-      <div class="field-label" style="color:#FF2D78">Vote Keyword — Song B</div>
-      <input type="text" id="kw-b" placeholder='e.g. "SONG B" or "BANGER"' style="border-color:#333" />
-    </div>
-  </div>
-
-  <div class="timer-row">
-    <label>Vote Timer</label>
-    <input type="range" id="timer-slider" min="30" max="120" step="10" value="60" oninput="document.getElementById('timer-disp').textContent=this.value+'s'" />
-    <div class="timer-val" id="timer-disp">60s</div>
-  </div>
-
-  <button class="btn-fight" onclick="startBattle()">Fight!</button>
-</div>
-
-<!-- BATTLE -->
-<div class="screen" id="battle">
-  <div class="battle-header">
-    <div class="battle-logo">Aux Wars</div>
-    <div class="round-badge" id="round-label">Round 1</div>
-    <div style="display:flex;align-items:center;gap:12px">
-      <button class="sim-btn sim-btn-a" onclick="simulateVote('a')">+A Vote</button>
-      <button class="sim-btn sim-btn-b" onclick="simulateVote('b')">+B Vote</button>
-      <div class="timer-display" id="timer-out">60</div>
-    </div>
-  </div>
-
-  <div class="battle-arena">
-    <div class="song-card card-a" id="card-a">
-      <div class="card-letter">A</div>
-      <div class="card-song-title" id="b-display-a-title">Song Title</div>
-      <div class="card-artist" id="b-display-a-artist">Artist</div>
-      <div class="card-user" id="b-display-a-user">@username</div>
-      <div class="vote-pill vote-pill-a" id="kw-display-a">TYPE: SONG A</div>
-      <div class="vote-count count-a" id="votes-a">0</div>
-      <div class="vote-bar-wrap"><div class="vote-bar-fill bar-a" id="bar-a" style="width:50%"></div></div>
+    <div class="header-container">
+        <h1>Aux Wars</h1>
+        <div class="subtitle">Who Controls The Aux?</div>
     </div>
 
-    <div class="vs-center">
-      <div class="vs-big">VS</div>
+    <div class="rules-card">
+        <ul class="rules-list">
+            <li class="rule-item">
+                <span class="rule-number">1</span>
+                <span>Two songs go head-to-head in the queue. The chat votes for who keeps the Aux Cord.</span>
+            </li>
+            <li class="rule-item">
+                <span class="rule-number">2</span>
+                <span>Type the keyword <span class="code-command">iplay[song-artist]</span> in chat to cast your vote and enter the mix. <span class="highlight-cyan">(Max 2 songs in queue)</span>.</span>
+            </li>
+            <li class="rule-item">
+                <span class="rule-number">3</span>
+                <span>High Gifters can use <span class="code-command">iskip</span> to instantly drop the current track and <span class="highlight-magenta">steal the round</span>!</span>
+            </li>
+            <li class="rule-item">
+                <span class="rule-number">4</span>
+                <span>The winning song's submitter gets <span class="highlight-cyan">pinned at the top of chat</span> for the entire <span class="highlight-magenta">song duration</span>.</span>
+            </li>
+            <li class="rule-item">
+                <span class="rule-number">5</span>
+                <span>The whole stream runs over to absolutely <span class="highlight-magenta">spam their account</span>!</span>
+            </li>
+        </ul>
     </div>
 
-    <div class="song-card card-b" id="card-b">
-      <div class="card-letter">B</div>
-      <div class="card-song-title" id="b-display-b-title">Song Title</div>
-      <div class="card-artist" id="b-display-b-artist">Artist</div>
-      <div class="card-user" id="b-display-b-user">@username</div>
-      <div class="vote-pill vote-pill-b" id="kw-display-b">TYPE: SONG B</div>
-      <div class="vote-count count-b" id="votes-b">0</div>
-      <div class="vote-bar-wrap"><div class="vote-bar-fill bar-b" id="bar-b" style="width:50%"></div></div>
-    </div>
-  </div>
+    <button class="start-btn" onclick="alert('Starting Aux Wars...')">Start A Round</button>
 
-  <div class="engage-bar">
-    <span class="engage-label">Engage</span>
-    <span class="engage-text" id="engage-cta">Drop your vote keyword in chat — winner gets PINNED!</span>
-    <div class="pin-badge">Winner Gets Pinned</div>
-  </div>
-</div>
-
-<!-- WINNER -->
-<div class="screen" id="winner">
-  <div class="winner-crown">🏆</div>
-  <div class="winner-label">Aux Wars Winner</div>
-  <div class="winner-song" id="w-song">Song Title</div>
-  <div class="winner-artist" id="w-artist">Artist</div>
-  <div class="winner-user" id="w-user">@username</div>
-  <div class="winner-cta">
-    <div class="winner-cta-title">Now Do This!</div>
-    <div class="winner-cta-text">
-      Pin <strong id="w-pin-user">@username</strong>'s account at the top of chat for 3 minutes.<br>
-      Tell the whole stream to run over and drop <strong>likes on their pinned video!</strong>
-    </div>
-  </div>
-  <button class="btn-next" onclick="goTo('setup')">Next Round</button>
-</div>
-
-<script>
-let voteA = 0, voteB = 0;
-let timerInterval = null;
-let timerLeft = 60;
-let roundNum = 1;
-
-function goTo(id) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-}
-
-function startBattle() {
-  const aTitle = document.getElementById('a-title').value || 'Song A';
-  const aArtist = document.getElementById('a-artist').value || 'Artist';
-  const aUser = document.getElementById('a-user').value || '@user_a';
-  const bTitle = document.getElementById('b-title').value || 'Song B';
-  const bArtist = document.getElementById('b-artist').value || 'Artist';
-  const bUser = document.getElementById('b-user').value || '@user_b';
-  const kwA = (document.getElementById('kw-a').value || 'SONG A').toUpperCase();
-  const kwB = (document.getElementById('kw-b').value || 'SONG B').toUpperCase();
-  timerLeft = parseInt(document.getElementById('timer-slider').value);
-
-  document.getElementById('b-display-a-title').textContent = aTitle;
-  document.getElementById('b-display-a-artist').textContent = aArtist;
-  document.getElementById('b-display-a-user').textContent = aUser;
-  document.getElementById('b-display-b-title').textContent = bTitle;
-  document.getElementById('b-display-b-artist').textContent = bArtist;
-  document.getElementById('b-display-b-user').textContent = bUser;
-  document.getElementById('kw-display-a').textContent = 'TYPE: ' + kwA;
-  document.getElementById('kw-display-b').textContent = 'TYPE: ' + kwB;
-  document.getElementById('engage-cta').textContent = 'Type "' + kwA + '" or "' + kwB + '" in chat to vote!';
-  document.getElementById('round-label').textContent = 'Round ' + roundNum;
-
-  voteA = 0; voteB = 0;
-  updateVotes();
-  goTo('battle');
-  startTimer();
-}
-
-function startTimer() {
-  clearInterval(timerInterval);
-  document.getElementById('timer-out').textContent = timerLeft;
-  document.getElementById('timer-out').classList.remove('urgent');
-  timerInterval = setInterval(() => {
-    timerLeft--;
-    document.getElementById('timer-out').textContent = timerLeft;
-    if (timerLeft <= 10) document.getElementById('timer-out').classList.add('urgent');
-    if (timerLeft <= 0) {
-      clearInterval(timerInterval);
-      endRound();
-    }
-  }, 1000);
-}
-
-function simulateVote(side) {
-  if (side === 'a') voteA++;
-  else voteB++;
-  updateVotes();
-}
-
-function updateVotes() {
-  document.getElementById('votes-a').textContent = voteA;
-  document.getElementById('votes-b').textContent = voteB;
-  const total = voteA + voteB || 1;
-  const pctA = Math.round((voteA / total) * 100);
-  const pctB = 100 - pctA;
-  document.getElementById('bar-a').style.width = pctA + '%';
-  document.getElementById('bar-b').style.width = pctB + '%';
-  document.getElementById('card-a').classList.toggle('leading', voteA >= voteB);
-  document.getElementById('card-b').classList.toggle('leading', voteB > voteA);
-}
-
-function endRound() {
-  clearInterval(timerInterval);
-  const winnerSide = voteA >= voteB ? 'a' : 'b';
-  const wTitle = document.getElementById('b-display-' + winnerSide + '-title').textContent;
-  const wArtist = document.getElementById('b-display-' + winnerSide + '-artist').textContent;
-  const wUser = document.getElementById('b-display-' + winnerSide + '-user').textContent;
-  document.getElementById('w-song').textContent = wTitle;
-  document.getElementById('w-artist').textContent = wArtist;
-  document.getElementById('w-user').textContent = wUser;
-  document.getElementById('w-pin-user').textContent = wUser;
-  roundNum++;
-  goTo('winner');
-}
-</script>
 </body>
 </html>
